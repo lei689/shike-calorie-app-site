@@ -1377,6 +1377,39 @@ svg {
   display: none;
 }
 
+.category-scroller {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  margin: 13px -20px 0;
+  padding: 0 20px 5px;
+  scrollbar-width: none;
+}
+
+.category-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.category-chip {
+  flex: none;
+  min-height: 32px;
+  padding: 6px 12px;
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: #f2f1ea;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.category-chip.is-active {
+  color: var(--green);
+  background: var(--green-pale);
+  border-color: rgba(31, 111, 80, 0.18);
+}
+
 .search-meta {
   display: flex;
   align-items: center;
@@ -2229,7 +2262,7 @@ function safePercent(value, goal) {
 
 
 // ---- foods.js ----
-const BUILTIN_VERSION = 1;
+const BUILTIN_VERSION = 2;
 
 const rows = [
   // 主食、谷物和薯类
@@ -2412,6 +2445,72 @@ const rows = [
   ["lotus-soup", "莲藕排骨汤", "中式菜肴", "g", 45, 2.5, 2.3, 4, "排骨莲藕汤", [["1 碗", 350]]],
   ["cabbage-tofu-soup", "白菜豆腐汤", "中式菜肴", "g", 35, 2.8, 1.8, 2.2, "豆腐白菜汤", [["1 碗", 350]]],
   ["chicken-salad", "鸡胸蔬菜沙拉", "中式菜肴", "g", 100, 11, 4, 4.5, "鸡肉沙拉|轻食沙拉", [["1 份", 300]]],
+  ["pepper-pork", "青椒肉丝", "中式菜肴", "g", 150, 10, 9, 7, "尖椒肉丝|青椒炒肉", [["1 份", 220]]],
+  ["yuxiang-pork", "鱼香肉丝", "中式菜肴", "g", 168, 10, 10, 10, "鱼香猪肉丝", [["1 份", 250]]],
+  ["twice-cooked-pork", "回锅肉", "中式菜肴", "g", 300, 12, 26, 8, "回锅猪肉", [["1 份", 200]]],
+  ["sweet-sour-pork", "糖醋里脊", "中式菜肴", "g", 260, 13, 14, 22, "糖醋肉|锅包肉", [["1 份", 220]]],
+  ["sweet-sour-ribs", "糖醋排骨", "中式菜肴", "g", 300, 16, 20, 16, "酸甜排骨", [["1 份", 200]]],
+  ["braised-ribs", "红烧排骨", "中式菜肴", "g", 270, 18, 19, 7, "炖排骨|烧排骨", [["1 份", 220]]],
+  ["cola-wings", "可乐鸡翅", "中式菜肴", "g", 210, 18, 12, 8, "可乐翅", [["1 份", 180]]],
+  ["braised-wings", "红烧鸡翅", "中式菜肴", "g", 190, 19, 11, 4, "卤鸡翅|烧鸡翅", [["1 份", 180]]],
+  ["yellow-braised-chicken", "黄焖鸡", "中式菜肴", "g", 180, 15, 10, 8, "黄焖鸡块", [["1 份", 250]]],
+  ["curry-chicken", "咖喱鸡", "中式菜肴", "g", 150, 12, 8, 9, "咖喱鸡块", [["1 份", 250]]],
+  ["dry-pot-cauliflower", "干锅花菜", "中式菜肴", "g", 130, 4, 9, 9, "干锅菜花|干锅花椰菜", [["1 份", 220]]],
+  ["di-san-xian", "地三鲜", "中式菜肴", "g", 140, 2, 9, 14, "土豆茄子青椒", [["1 份", 250]]],
+  ["pepper-potato", "青椒土豆丝", "中式菜肴", "g", 95, 2, 5, 12, "炒土豆丝|酸辣土豆丝", [["1 份", 220]]],
+  ["garlic-broccoli", "蒜蓉西兰花", "中式菜肴", "g", 65, 3, 4, 5, "清炒西兰花", [["1 份", 220]]],
+  ["stir-fried-greens", "清炒青菜", "中式菜肴", "g", 55, 2, 3, 5, "炒青菜|炒小白菜|炒菠菜", [["1 份", 220]]],
+  ["yuxiang-eggplant", "鱼香茄子", "中式菜肴", "g", 120, 2, 8, 11, "烧茄子", [["1 份", 220]]],
+  ["home-tofu", "家常豆腐", "中式菜肴", "g", 120, 7, 8, 5, "红烧豆腐", [["1 份", 220]]],
+  ["tomato-tofu-soup", "番茄豆腐汤", "中式菜肴", "g", 45, 2.5, 2, 4, "西红柿豆腐汤", [["1 碗", 350]]],
+  ["seaweed-egg-soup", "紫菜蛋花汤", "中式菜肴", "g", 30, 2, 1.5, 2.5, "蛋花紫菜汤", [["1 碗", 300]]],
+  ["steamed-egg", "鸡蛋羹", "中式菜肴", "g", 62, 5.5, 3.8, 2, "蒸鸡蛋|鸡蛋蒸蛋", [["1 碗", 200]]],
+  ["pickled-fish", "酸菜鱼", "中式菜肴", "g", 110, 10, 6, 4, "酸菜鱼片", [["1 份", 300]]],
+  ["boiled-fish", "水煮鱼", "中式菜肴", "g", 160, 13, 12, 2, "水煮鱼片", [["1 份", 300]]],
+  ["crayfish", "小龙虾", "中式菜肴", "g", 120, 18, 4, 2, "麻辣小龙虾|虾尾", [["10 只可食部", 150]]],
+  ["grilled-fish", "烤鱼", "中式菜肴", "g", 170, 16, 10, 4, "麻辣烤鱼", [["1 份", 300]]],
+  ["spicy-hotpot", "麻辣香锅", "中式菜肴", "g", 230, 10, 17, 10, "香锅|麻辣锅", [["1 份", 300]]],
+  ["malatang", "麻辣烫", "中式菜肴", "g", 120, 6, 7, 9, "麻辣烫菜", [["1 碗", 400]]],
+  ["hotpot-beef", "火锅肥牛片", "中式菜肴", "g", 250, 18, 20, 1, "肥牛卷|火锅牛肉", [["1 份", 150]]],
+  ["hotpot-vegetables", "火锅清汤蔬菜", "中式菜肴", "g", 40, 1.5, 2, 4, "火锅蔬菜", [["1 碗", 300]]],
+  ["braised-pork-rice", "卤肉饭", "中式菜肴", "g", 220, 7, 11, 24, "鲁肉饭", [["1 碗", 400]]],
+  ["lanzhou-noodles", "兰州牛肉面", "中式菜肴", "g", 120, 6, 3.5, 17, "牛肉拉面|兰州拉面", [["1 碗", 600]]],
+  ["zhajiang-noodles", "炸酱面", "中式菜肴", "g", 160, 6, 6, 22, "老北京炸酱面", [["1 碗", 450]]],
+  ["hot-dry-noodles", "热干面", "中式菜肴", "g", 190, 6, 8, 25, "武汉热干面", [["1 碗", 400]]],
+  ["chongqing-noodles", "重庆小面", "中式菜肴", "g", 160, 5, 8, 20, "小面", [["1 碗", 450]]],
+  ["luosifen", "螺蛳粉", "中式菜肴", "g", 150, 6, 6, 20, "柳州螺蛳粉", [["1 碗", 450]]],
+  ["hot-sour-noodles", "酸辣粉", "中式菜肴", "g", 140, 4, 6, 20, "红薯酸辣粉", [["1 碗", 400]]],
+  ["fried-rice-noodles", "炒米粉", "中式菜肴", "g", 170, 5, 6, 25, "炒粉|炒河粉|炒米线", [["1 盘", 350]]],
+  ["omurice", "蛋包饭", "中式菜肴", "g", 170, 5.5, 6, 24, "日式蛋包饭", [["1 份", 350]]],
+  ["hamburger", "普通汉堡", "中式菜肴", "g", 250, 12, 11, 27, "牛肉汉堡|鸡肉汉堡|汉堡包", [["1 个", 180]]],
+  ["fried-chicken", "炸鸡", "中式菜肴", "g", 270, 22, 17, 10, "炸鸡块|肯德基炸鸡", [["1 块", 100]]],
+  ["french-fries", "薯条", "中式菜肴", "g", 312, 3.5, 15, 41, "炸薯条|麦当劳薯条", [["1 中份", 115]]],
+  ["pizza", "披萨", "中式菜肴", "g", 266, 11, 10, 33, "比萨|披萨饼", [["1 片", 110]]],
+  ["sandwich", "三明治", "中式菜肴", "g", 240, 11, 10, 26, "火腿三明治|鸡肉三明治", [["1 个", 180]]],
+  ["hot-dog", "热狗", "中式菜肴", "g", 250, 10, 14, 22, "热狗肠面包", [["1 个", 120]]],
+  ["oden", "关东煮", "中式菜肴", "g", 90, 6, 4, 7, "便利店关东煮|鱼丸萝卜", [["1 份", 250]]],
+  ["kaolengmian", "烤冷面", "中式菜肴", "g", 180, 7, 7, 23, "东北烤冷面", [["1 份", 250]]],
+  ["hand-pancake", "手抓饼", "主食", "g", 330, 7, 18, 35, "台湾手抓饼", [["1 张", 120]]],
+  ["scallion-pancake", "葱油饼", "主食", "g", 320, 7, 15, 40, "葱饼|葱花饼", [["1 张", 100]]],
+  ["egg-pancake", "鸡蛋灌饼", "主食", "g", 280, 9, 14, 29, "灌饼", [["1 个", 180]]],
+  ["roujiamo", "肉夹馍", "主食", "g", 260, 12, 10, 31, "腊汁肉夹馍", [["1 个", 180]]],
+  ["shaomai", "烧麦", "主食", "g", 220, 8, 8, 29, "烧卖|糯米烧卖", [["1 个", 30]]],
+  ["xiaolongbao", "小笼包", "主食", "g", 230, 10, 9, 26, "小笼汤包", [["1 个", 25]]],
+  ["shengjianbao", "生煎包", "主食", "g", 280, 10, 14, 28, "生煎", [["1 个", 50]]],
+  ["tangyuan", "汤圆", "主食", "g", 311, 4.5, 8, 55, "元宵|芝麻汤圆", [["1 个", 20]]],
+  ["zongzi", "粽子", "主食", "g", 220, 5, 6, 37, "肉粽|红枣粽", [["1 个", 150]]],
+  ["cold-noodles", "凉皮", "主食", "g", 150, 4, 5, 23, "凉皮面筋|陕西凉皮", [["1 份", 300]]],
+  ["sweet-tofu-pudding", "甜豆花", "饮品零食", "g", 95, 4, 3.5, 12, "豆花|豆腐脑甜", [["1 碗", 250]]],
+  ["savory-tofu-pudding", "咸豆腐脑", "中式菜肴", "g", 70, 4, 3.5, 6, "豆腐脑|咸豆花", [["1 碗", 300]]],
+  ["white-bread", "白吐司", "主食", "g", 280, 8.5, 4, 52, "白面包|吐司面包", [["1 片", 35]]],
+  ["croissant", "可颂", "饮品零食", "g", 406, 8, 21, 46, "牛角包|羊角面包", [["1 个", 60]]],
+  ["croissant-sandwich", "火腿可颂", "饮品零食", "g", 330, 10, 19, 31, "可颂三明治", [["1 个", 140]]],
+  ["soda-crackers", "苏打饼干", "饮品零食", "g", 430, 8, 14, 68, "咸饼干|梳打饼干", [["3 片", 20]]],
+  ["protein-bar", "蛋白棒", "饮品零食", "g", 350, 30, 10, 35, "能量棒|代餐棒", [["1 根", 50]]],
+  ["oat-milk", "燕麦奶", "饮品零食", "ml", 45, 1, 1.5, 7, "燕麦饮|燕麦植物奶", [["1 杯", 250]]],
+  ["sweet-soy-milk", "甜豆浆", "饮品零食", "ml", 50, 2.8, 1.5, 6, "加糖豆浆", [["1 杯", 250]]],
+  ["oolong-tea", "无糖乌龙茶", "饮品零食", "ml", 0, 0, 0, 0, "乌龙茶|三得利乌龙茶", [["1 瓶", 500]]],
+  ["green-tea", "无糖绿茶", "饮品零食", "ml", 0, 0, 0, 0, "绿茶|东方树叶", [["1 瓶", 500]]],
 
   // 酱料
   ["ketchup", "番茄酱", "调味酱料", "g", 110, 1.2, 0.2, 26, "茄汁", [["1 汤匙", 17]]],
@@ -2634,6 +2733,33 @@ async function deleteWeight(date) {
   const db = await openDatabase();
   const transaction = db.transaction("weights", "readwrite");
   transaction.objectStore("weights").delete(date);
+  await transactionDone(transaction);
+}
+
+async function replaceUserData({ profile, entries, weights, foods }) {
+  const db = await openDatabase();
+  const transaction = db.transaction(
+    ["profile", "entries", "weights", "foods"],
+    "readwrite"
+  );
+  const profileStore = transaction.objectStore("profile");
+  const entryStore = transaction.objectStore("entries");
+  const weightStore = transaction.objectStore("weights");
+  const foodStore = transaction.objectStore("foods");
+
+  profileStore.clear();
+  entryStore.clear();
+  weightStore.clear();
+  foodStore.clear();
+
+  builtInFoods.forEach((food) => foodStore.put({ ...food }));
+  foods
+    .filter((food) => food.sourceKey !== "builtin")
+    .forEach((food) => foodStore.put({ ...food, updatedAt: new Date().toISOString() }));
+  if (profile) profileStore.put({ ...profile, id: "default" });
+  entries.forEach((entry) => entryStore.put(entry));
+  weights.forEach((record) => weightStore.put(record));
+
   await transactionDone(transaction);
 }
 
@@ -2905,6 +3031,8 @@ const modalRoot = document.querySelector("#modal-root");
 const toastRoot = document.querySelector("#toast-root");
 const floatingAdd = document.querySelector("#floating-add-button");
 const connectionBadge = document.querySelector("#connection-badge");
+const BACKUP_FORMAT = "shike-calorie-backup";
+const BACKUP_VERSION = 1;
 
 const state = {
   profile: null,
@@ -2921,6 +3049,7 @@ const state = {
     quantity: null,
     unit: null,
     meal: "lunch",
+    category: "全部",
     localResults: [],
     remoteResults: [],
     remoteStatus: "idle",
@@ -3319,6 +3448,14 @@ function renderProfileView() {
           <button class="button button-secondary button-small" type="button" data-action="open-custom-food">新建</button>
         </div>
         <div class="settings-row">
+          <div><h2>数据备份</h2><p>导出全部饮食、体重和个人设置，或从备份恢复。</p></div>
+          <div class="inline-actions">
+            <button class="button button-secondary button-small" type="button" data-action="export-backup">导出</button>
+            <button class="button button-ghost button-small" type="button" data-action="import-backup">恢复</button>
+          </div>
+          <input id="backup-file-input" type="file" accept=".json,application/json" hidden />
+        </div>
+        <div class="settings-row">
           <div><h2>安装到桌面</h2><p>首次打开后缓存应用，离线也能记录。</p></div>
           <button class="button button-ghost button-small" type="button" data-action="open-install">方法</button>
         </div>
@@ -3331,7 +3468,7 @@ function renderProfileView() {
       <section class="settings-card">
         <div class="settings-row" style="display:block">
           <h2>关于食刻</h2>
-          <p class="about-copy">食刻 v1.0 · 本地优先的卡路里记录工具。内置数据为常见食物估算值，包装食品部分来自 <a href="https://world.openfoodfacts.org/" target="_blank" rel="noreferrer">Open Food Facts</a>。应用不提供医疗诊断；如产品标签与数据库不一致，以包装标签为准。</p>
+          <p class="about-copy">食刻 v1.1 · 本地优先的卡路里记录工具。内置数据为常见食物估算值，包装食品部分来自 <a href="https://world.openfoodfacts.org/" target="_blank" rel="noreferrer">Open Food Facts</a>。应用不提供医疗诊断；如产品标签与数据库不一致，以包装标签为准。</p>
         </div>
       </section>
     </section>
@@ -3501,10 +3638,28 @@ function normalizeSearchText(text) {
     .replace(/[，。,.!?！？()（）]/g, "");
 }
 
-function searchFoods(query) {
-  if (!query) return popularFoods();
+function characterOverlapScore(needle, candidate) {
+  const queryCharacters = [...new Set(normalizeSearchText(needle))];
+  const candidateCharacters = new Set(normalizeSearchText(candidate));
+  if (!queryCharacters.length) return 0;
+  return queryCharacters.filter((character) => candidateCharacters.has(character)).length /
+    queryCharacters.length;
+}
+
+function searchFoods(query, category = "全部") {
+  const categoryFoods =
+    category === "全部"
+      ? state.foods
+      : state.foods.filter((food) => food.category === category);
+  if (!query) {
+    return category === "全部"
+      ? popularFoods()
+      : categoryFoods
+          .sort((a, b) => a.name.localeCompare(b.name, "zh-CN"))
+          .slice(0, 40);
+  }
   const needle = normalizeSearchText(query);
-  return state.foods
+  const directResults = categoryFoods
     .map((food) => {
       const name = normalizeSearchText(food.name);
       const aliases = (food.aliases || []).map(normalizeSearchText);
@@ -3521,6 +3676,18 @@ function searchFoods(query) {
     .filter((result) => result.score > 0)
     .sort((a, b) => b.score - a.score || a.food.name.localeCompare(b.food.name, "zh-CN"))
     .slice(0, 16)
+    .map((result) => result.food);
+  if (directResults.length) return directResults;
+
+  return categoryFoods
+    .map((food) => {
+      const candidates = [food.name, ...(food.aliases || [])];
+      const score = Math.max(...candidates.map((candidate) => characterOverlapScore(needle, candidate)));
+      return { food, score };
+    })
+    .filter((result) => result.score >= 0.55)
+    .sort((a, b) => b.score - a.score || a.food.name.localeCompare(b.food.name, "zh-CN"))
+    .slice(0, 12)
     .map((result) => result.food);
 }
 
@@ -3541,6 +3708,7 @@ function openFoodSearch(meal = defaultMealForNow()) {
     quantity: null,
     unit: null,
     meal,
+    category: "全部",
     localResults: popularFoods(),
     remoteResults: [],
     remoteStatus: "idle",
@@ -3556,6 +3724,12 @@ function openFoodSearch(meal = defaultMealForNow()) {
         <input id="food-search" type="search" autocomplete="off" enterkeyhint="search" placeholder="搜索食物或输入“2个鸡蛋”" value="" aria-label="搜索食物" />
       </div>
       <p class="parsed-hint" id="parsed-hint" hidden></p>
+      <div class="category-scroller" aria-label="食物分类">
+        ${FOOD_CATEGORIES.map(
+          (category) =>
+            `<button class="category-chip ${category === "全部" ? "is-active" : ""}" type="button" data-action="filter-food-category" data-category="${escapeHtml(category)}">${escapeHtml(category)}</button>`
+        ).join("")}
+      </div>
       <div class="search-meta">
         <span id="search-count">常用食物</span>
         <button class="button button-ghost button-small" type="button" data-action="open-custom-food">自定义食物</button>
@@ -3654,6 +3828,9 @@ function refreshSearchResults({ updateInput = false } = {}) {
         ? `已识别份量：${round1(state.search.quantity)} ${state.search.unit} · 搜索“${state.search.query}”`
         : "";
   }
+  document.querySelectorAll(".category-chip").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.category === state.search.category);
+  });
 }
 
 function handleSearchInput(value) {
@@ -3662,7 +3839,7 @@ function handleSearchInput(value) {
   state.search.query = parsed.query;
   state.search.quantity = parsed.quantity;
   state.search.unit = parsed.unit;
-  state.search.localResults = searchFoods(parsed.query);
+  state.search.localResults = searchFoods(parsed.query, state.search.category);
   state.search.remoteResults = [];
   refreshSearchResults();
 
@@ -3671,7 +3848,7 @@ function handleSearchInput(value) {
   if (state.search.controller) state.search.controller.abort();
   state.search.controller = null;
 
-  if (normalizeSearchText(parsed.query).length < 2) {
+  if (state.search.category !== "全部" || normalizeSearchText(parsed.query).length < 2) {
     state.search.remoteStatus = "idle";
     refreshSearchResults();
     return;
@@ -4169,6 +4346,202 @@ async function clearData() {
   }
 }
 
+function exportBackup() {
+  const payload = {
+    format: BACKUP_FORMAT,
+    version: BACKUP_VERSION,
+    exportedAt: new Date().toISOString(),
+    profile: state.profile,
+    entries: state.entries,
+    weights: state.weights,
+    foods: state.foods.filter((food) => food.sourceKey !== "builtin")
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: "application/json;charset=utf-8"
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `shike-backup-${toDateKey()}.json`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  showToast(`已导出 ${state.entries.length} 条饮食记录和 ${state.weights.length} 条体重记录。`);
+}
+
+function openBackupPicker() {
+  document.querySelector("#backup-file-input")?.click();
+}
+
+function isValidDateKey(value) {
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+function sanitizeBackup(payload) {
+  if (!payload || payload.format !== BACKUP_FORMAT || Number(payload.version) !== BACKUP_VERSION) {
+    throw new Error("这不是受支持的食刻备份文件。");
+  }
+  if (!Array.isArray(payload.entries) || !Array.isArray(payload.weights)) {
+    throw new Error("备份文件缺少饮食或体重记录。");
+  }
+  if (payload.entries.length > 50000 || payload.weights.length > 10000) {
+    throw new Error("备份文件过大，无法安全导入。");
+  }
+
+  const entries = payload.entries
+    .filter(
+      (entry) =>
+        entry &&
+        typeof entry.id === "string" &&
+        isValidDateKey(entry.date) &&
+        MEALS[entry.meal] &&
+        entry.food &&
+        typeof entry.food.name === "string"
+    )
+    .map((entry) => ({
+      id: entry.id,
+      date: entry.date,
+      meal: entry.meal,
+      food: {
+        id: String(entry.food.id || makeId("restored-food")),
+        name: String(entry.food.name).slice(0, 100),
+        brand: String(entry.food.brand || "").slice(0, 100),
+        category: String(entry.food.category || "已恢复食物"),
+        basis: entry.food.basis === "ml" ? "ml" : "g",
+        kcal: clampNumber(entry.food.kcal, 0, 1200, 0),
+        protein: clampNumber(entry.food.protein, 0, 100, 0),
+        fat: clampNumber(entry.food.fat, 0, 100, 0),
+        carbs: clampNumber(entry.food.carbs, 0, 100, 0),
+        aliases: Array.isArray(entry.food.aliases)
+          ? entry.food.aliases.filter((item) => typeof item === "string").slice(0, 20)
+          : [],
+        servings: Array.isArray(entry.food.servings)
+          ? entry.food.servings.slice(0, 20).map((serving, index) => ({
+              id: String(serving.id || `restored-serving-${index}`),
+              label: String(serving.label || "1 份").slice(0, 40),
+              amount: clampNumber(serving.amount, 0.1, 5000, 100)
+            }))
+          : [],
+        source: String(entry.food.source || "备份恢复"),
+        sourceKey: ["custom", "remote"].includes(entry.food.sourceKey)
+          ? entry.food.sourceKey
+          : "custom",
+        completeness: "complete"
+      },
+      amount: clampNumber(entry.amount, 0.1, 5000, 100),
+      unitId: String(entry.unitId || "base"),
+      unitLabel: entry.unitLabel ? String(entry.unitLabel).slice(0, 50) : null,
+      amountInBase: clampNumber(entry.amountInBase, 0.1, 5000, 100),
+      kcal: clampNumber(entry.kcal, 0, 60000, 0),
+      protein: clampNumber(entry.protein, 0, 5000, 0),
+      fat: clampNumber(entry.fat, 0, 5000, 0),
+      carbs: clampNumber(entry.carbs, 0, 5000, 0),
+      createdAt:
+        typeof entry.createdAt === "string" ? entry.createdAt : new Date().toISOString()
+    }));
+
+  const weights = payload.weights
+    .filter(
+      (record) =>
+        record && isValidDateKey(record.date) && Number.isFinite(Number(record.weight))
+    )
+    .map((record) => ({
+      date: record.date,
+      weight: clampNumber(record.weight, 30, 300, 70),
+      updatedAt: typeof record.updatedAt === "string" ? record.updatedAt : new Date().toISOString()
+    }));
+
+  const foods = (Array.isArray(payload.foods) ? payload.foods : [])
+    .filter(
+      (food) =>
+        food &&
+        typeof food.id === "string" &&
+        typeof food.name === "string" &&
+        food.sourceKey !== "builtin"
+    )
+    .slice(0, 5000)
+    .map((food) => ({
+      id: food.id,
+      name: food.name.slice(0, 100),
+      brand: String(food.brand || "").slice(0, 100),
+      category: String(food.category || "自定义").slice(0, 50),
+      basis: food.basis === "ml" ? "ml" : "g",
+      kcal: clampNumber(food.kcal, 0, 1200, 0),
+      protein: clampNumber(food.protein, 0, 100, 0),
+      fat: clampNumber(food.fat, 0, 100, 0),
+      carbs: clampNumber(food.carbs, 0, 100, 0),
+      aliases: Array.isArray(food.aliases)
+        ? food.aliases.filter((item) => typeof item === "string").slice(0, 20)
+        : [],
+      servings: Array.isArray(food.servings)
+        ? food.servings.slice(0, 20).map((serving, index) => ({
+            id: String(serving.id || `restored-serving-${index}`),
+            label: String(serving.label || "1 份").slice(0, 40),
+            amount: clampNumber(serving.amount, 0.1, 5000, 100)
+          }))
+        : [],
+      source: String(food.source || "备份恢复"),
+      sourceKey: food.sourceKey === "remote" ? "remote" : "custom",
+      completeness: "complete"
+    }));
+
+  let profile = null;
+  if (payload.profile && typeof payload.profile === "object") {
+    profile = {
+      id: "default",
+      sex: payload.profile.sex === "female" ? "female" : "male",
+      age: clampNumber(payload.profile.age, 18, 100, 25),
+      height: clampNumber(payload.profile.height, 120, 230, 170),
+      currentWeight: clampNumber(payload.profile.currentWeight, 30, 300, 70),
+      targetWeight: clampNumber(payload.profile.targetWeight, 30, 300, 65),
+      activity: ACTIVITY_LEVELS[payload.profile.activity]
+        ? payload.profile.activity
+        : "sedentary",
+      weeklyLoss: clampNumber(payload.profile.weeklyLoss, 0, 1, 0.5),
+      goalOverride:
+        payload.profile.goalOverride == null
+          ? null
+          : clampNumber(payload.profile.goalOverride, 800, 6000, 1600)
+    };
+  }
+  return { profile, entries, weights, foods };
+}
+
+async function handleBackupFile(file, input) {
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) {
+    showToast("备份文件超过 10 MB，无法导入。", "error");
+    input.value = "";
+    return;
+  }
+  try {
+    const payload = JSON.parse(await file.text());
+    const restored = sanitizeBackup(payload);
+    const confirmed = window.confirm(
+      `即将用备份恢复 ${restored.entries.length} 条饮食记录和 ${restored.weights.length} 条体重记录。\n\n当前记录会被替换，是否继续？`
+    );
+    if (!confirmed) {
+      input.value = "";
+      return;
+    }
+    await replaceUserData(restored);
+    state.profile = restored.profile;
+    state.foods = await getAllFoods();
+    state.entries = restored.entries;
+    state.weights = restored.weights;
+    state.selectedDate = toDateKey();
+    input.value = "";
+    render();
+    showToast("备份已恢复。");
+    if (!state.profile) openOnboarding();
+  } catch (error) {
+    console.error(error);
+    input.value = "";
+    showToast(error.message || "备份文件无法读取。", "error");
+  }
+}
+
 function navigate(view, date = null) {
   if (!["today", "history", "profile"].includes(view)) view = "today";
   state.view = view;
@@ -4207,11 +4580,20 @@ function handleDocumentClick(event) {
     if (food) openAmountSheet(food);
   } else if (action === "retry-remote") {
     if (state.search.query) runRemoteSearch(state.search.query);
+  } else if (action === "filter-food-category") {
+    closeSearchRequest();
+    state.search.category = actionElement.dataset.category || "全部";
+    state.search.localResults = searchFoods(state.search.query, state.search.category);
+    state.search.remoteResults = [];
+    state.search.remoteStatus = "idle";
+    refreshSearchResults();
   } else if (action === "open-custom-food") openCustomFoodForm();
   else if (action === "delete-entry") deleteCurrentEntry();
   else if (action === "open-day") navigate("today", actionElement.dataset.date);
   else if (action === "open-install") openInstallInstructions();
   else if (action === "prompt-install") promptInstall();
+  else if (action === "export-backup") exportBackup();
+  else if (action === "import-backup") openBackupPicker();
   else if (action === "clear-data") clearData();
 }
 
@@ -4227,6 +4609,8 @@ function handleDocumentInput(event) {
     updateAmountPreview();
   } else if (target.closest("[data-profile-form]")) {
     updateGoalPreview(target.form);
+  } else if (target.id === "backup-file-input" && target.files?.[0]) {
+    void handleBackupFile(target.files[0], target);
   }
 }
 

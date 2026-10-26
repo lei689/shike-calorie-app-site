@@ -1,4 +1,4 @@
-const CACHE_NAME = "shike-standalone-v1.0.1";
+const CACHE_NAME = "shike-standalone-v1.1.0";
 const SHELL = ["./", "./index.html"];
 
 self.addEventListener("install", (event) => {
